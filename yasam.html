@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Günlük Yaşam Bilgisi</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); opacity: 0.4; }
+      50% { transform: translateY(-30px) rotate(180deg) scale(1.2); opacity: 0.8; }
+    }
+
+    header {
+      position: relative;
+      text-align: center;
+      padding: 80px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(25px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 10;
+    }
+
+    .header-content {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 4rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #fff 0%, #f8f8ff 50%, #e6e6ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      text-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
+      animation: glow 3s ease-in-out infinite alternate;
+      letter-spacing: -2px;
+    }
+
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.4)); }
+      to { filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.8)); }
+    }
+
+    .subtitle {
+      font-size: 1.4rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 300;
+      margin-bottom: 30px;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 30px;
+    }
+
+    .stat-item {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 15px 25px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    main {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 100px 20px;
+      z-index: 10;
+    }
+
+    .topics-grid {
+      display: grid;
+      gap: 40px;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    }
+
+    .topic {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(25px);
+      border-radius: 25px;
+      padding: 40px;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .topic::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2, #764ba2);
+      transition: left 0.6s ease;
+    }
+
+    .topic:hover::before {
+      left: 100%;
+    }
+
+    .topic::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.05), transparent);
+      transition: left 0.8s ease;
+    }
+
+    .topic:hover::after {
+      left: 100%;
+    }
+
+    .topic:hover {
+      transform: translateY(-15px) scale(1.03);
+      box-shadow: 0 25px 80px rgba(102, 126, 234, 0.2);
+      background: rgba(255, 255, 255, 1);
+    }
+
+    .topic-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+    }
+
+    .topic-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      max-width: 70%;
+    }
+
+    .topic-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: white;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .topic:hover .topic-icon {
+      transform: rotate(10deg) scale(1.1);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+    }
+
+    .topic-preview {
+      color: #666;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      opacity: 0.8;
+    }
+
+    .content {
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+      background: linear-gradient(135deg, #f8f9ff 0%, #f2f4ff 100%);
+      border-radius: 20px;
+      margin-top: 0;
+      border: 1px solid rgba(102, 126, 234, 0.1);
+    }
+
+    .content.active {
+      max-height: 1200px;
+      opacity: 1;
+      padding: 35px;
+      margin-top: 25px;
+    }
+
+    .video-container {
+      position: relative;
+      margin-bottom: 30px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      background: #000;
+    }
+
+    .video-placeholder {
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      border-radius: 15px;
+    }
+
+    video {
+      width: 100%;
+      max-height: 400px;
+      border-radius: 15px;
+      transition: all 0.4s ease;
+    }
+
+    video:hover {
+      transform: scale(1.02);
+    }
+
+    .transcript {
+      background: white;
+      padding: 35px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      line-height: 1.9;
+      border-left: 5px solid #667eea;
+    }
+
+    .transcript strong {
+      color: #667eea;
+      font-size: 1.2rem;
+      display: block;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .transcript p {
+      color: #555;
+      margin-bottom: 18px;
+      font-size: 1.05rem;
+    }
+
+    .transcript u {
+      color: #667eea;
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 2px solid #764ba2;
+      padding-bottom: 2px;
+    }
+
+    .expand-arrow {
+      transition: all 0.4s ease;
+      font-size: 1.4rem;
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .topic.active .expand-arrow {
+      transform: rotate(180deg);
+      color: #764ba2;
+    }
+
+    footer {
+      position: relative;
+      text-align: center;
+      padding: 60px 20px;
+      background: rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(25px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.9);
+      z-index: 10;
+    }
+
+    footer a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.4s ease;
+      padding: 15px 30px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    footer a:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(102, 126, 234, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+    }
+
+    .topic-category {
+      display: inline-block;
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .topics-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+      }
+
+      .topic {
+        padding: 25px;
+      }
+
+      h1 {
+        font-size: 2.8rem;
+      }
+
+      main {
+        padding: 60px 15px;
+      }
+
+      .topic-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.6rem;
+      }
+
+      .stats {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .topic-title {
+        font-size: 1.4rem;
+        max-width: 85%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+  
+  <header>
+    <div class="header-content">
+      <h1>Günlük Yaşam Bilgisi</h1>
+      <p class="subtitle">Modern yaşam becerilerini öğrenmenin en etkili yolu</p>
+
+    </div>
+  </header>
+
+  <main>
+    <div class="topics-grid">
+      <div class="topic loading-animation" onclick="toggleContent('topic1', this)" style="animation-delay: 0.1s">
+        <div class="topic-category">🧼 Hijyen & Sağlık</div>
+        <div class="topic-header">
+          <h2 class="topic-title">Temizlik ve Kişisel Hijyen</h2>
+          <div class="topic-icon pulse">🧽</div>
+        </div>
+        <p class="topic-preview">Günlük yaşamda sağlıklı kalmanın temel kuralları: El yıkama, diş bakımı ve kişisel temizlik.</p>
+        <div class="expand-arrow">▼</div>
+        <div id="topic1" class="content">
+          <div class="video-container">
+            <div class="video-placeholder">
+              🎥 Video: Temizlik ve Hijyen Rehberi
+            </div>
+          </div>
+          <div class="transcript">
+            <strong>📝 Video İçeriği</strong>
+            <p>
+              Merhaba!<br />
+              Bugün günlük yaşamda çok önemli olan <strong>temizlik</strong> ve <strong>kişisel hijyen</strong> konusunu öğreneceğiz.<br />
+              Hazırsan başlayalım!<br /><br />
+
+              İlk olarak: <strong>Kişisel hijyen nedir?</strong><br />
+              Kişisel hijyen, vücudumuzu temiz tutmamız anlamına gelir. Bu, sağlıklı kalmamıza yardımcı olur.<br /><br />
+
+              <u>Ellerimizi ne zaman yıkamalıyız?</u><br />
+              - Yemekten önce ve sonra<br />
+              - Tuvaletten sonra<br />
+              - Dışarıdan eve geldiğimizde<br />
+              - Burnumuzu silince veya hapşırınca<br /><br />
+
+              Elleri sabunla en az 20 saniye yıkamalıyız.<br />
+              Bu şekilde mikropları uzaklaştırmış oluruz.<br /><br />
+
+              <u>Dişlerimizi ne zaman fırçalamalıyız?</u><br />
+              - Sabah kahvaltıdan sonra<br />
+              - Akşam yatmadan önce<br /><br />
+              Dişlerimizi günde en az 2 kez fırçlamak çok önemlidir.<br /><br />
+
+              <u>Vücudumuzu nasıl temiz tutarız?</u><br />
+              - Her gün veya gün aşırı duş almalıyız<br />
+              - Temiz kıyafetler giymeliyiz<br />
+              - Tırnaklarımızı düzenli kesmeliyiz<br />
+              - Saçlarımızı temiz tutmalıyız<br /><br />
+
+              Unutma, temizlik sadece kendimiz için değil, çevremizdekiler için de önemlidir.<br />
+              Temiz olan insanlar daha sağlıklı ve mutlu olur!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="topic loading-animation" onclick="toggleContent('topic2', this)" style="animation-delay: 0.2s">
+        <div class="topic-category">🚦 Güvenlik</div>
+        <div class="topic-header">
+          <h2 class="topic-title">Trafik Işıkları ve Uyarılar</h2>
+          <div class="topic-icon pulse">🚦</div>
+        </div>
+        <p class="topic-preview">Trafik kuralları ve güvenlik: Işık sistemi, yaya geçitleri ve sokakta güvenli hareket etme.</p>
+        <div class="expand-arrow">▼</div>
+        <div id="topic2" class="content">
+          <div class="video-container">
+            <div class="video-placeholder">
+              🎥 Video: Trafik Güvenliği Rehberi
+            </div>
+          </div>
+          <div class="transcript">
+            <strong>📝 Video İçeriği</strong>
+            <p>
+              Merhaba!<br />
+              Bu derste günlük yaşamda sıkça karşılaştığımız <strong>trafik ışıkları ve uyarı işaretlerini</strong> öğreneceğiz.<br />
+              Hazırsan başlayalım!<br /><br />
+
+              <strong>Trafik ışıkları nedir?</strong><br />
+              Trafik ışıkları, araçların ve yayaların güvenli şekilde hareket etmesini sağlar.<br /><br />
+
+              - <span style="color:red">Kırmızı ışık:</span> Dur.<br />
+              - <span style="color:orange">Sarı ışık:</span> Hazırlan. Işık değişmek üzere.<br />
+              - <span style="color:green">Yeşil ışık:</span> Geç. Yol senin.<br /><br />
+
+              Unutma! Işık yeşil olsa bile önce sağına ve soluna bakmalısın.<br /><br />
+
+              <strong>Yaya geçidi nedir?</strong><br />
+              Yaya geçidi, yayaların güvenli şekilde karşıdan karşıya geçmesi için yapılan beyaz çizgilerdir.<br />
+              Eğer ışık yoksa sürücüler yayalara yol vermelidir.<br /><br />
+
+              <strong>Trafik işaretleri nelerdir?</strong><br />
+              Trafikte sadece ışıklar değil, işaret levhaları da çok önemlidir. İşte bazı örnekler:<br />
+              - Dikkat! Okul geçidi<br />
+              - Yavaşla<br />
+              - Yol çalışması<br />
+              - Dur tabelası<br />
+              - Yayaya yol ver<br /><br />
+
+              Bu işaretleri gördüğümüzde dikkatli olmalıyız.<br /><br />
+
+              <strong>Gerçek hayat örnekleri:</strong><br />
+              Okula giderken kırmızı ışıkta beklemeliyiz.<br />
+              Yeşil ışık yandığında dikkatlice geçmeliyiz.<br />
+              Otobüs durağı yakınında yaya geçidine dikkat etmeliyiz.<br /><br />
+
+              Trafik kurallarına uymak hem seni hem de başkalarını korur.<br />
+              Harika iş çıkardın!<br />
+              Bir sonraki derste görüşmek üzere!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="topic loading-animation" onclick="toggleContent('topic3', this)" style="animation-delay: 0.3s">
+        <div class="topic-category">🏥 Sağlık</div>
+        <div class="topic-header">
+          <h2 class="topic-title">Temel Sağlık Bilgileri</h2>
+          <div class="topic-icon pulse">🏥</div>
+        </div>
+        <p class="topic-preview">Sağlıklı yaşam rehberi: Doktora ne zaman gidilir, ilaç kullanımı ve sağlıklı beslenme.</p>
+        <div class="expand-arrow">▼</div>
+        <div id="topic3" class="content">
+          <div class="video-container">
+            <div class="video-placeholder">
+              🎥 Video: Temel Sağlık Rehberi
+            </div>
+          </div>
+          <div class="transcript">
+            <strong>📝 Video İçeriği</strong>
+            <p>
+              Merhaba!<br />
+              Bu derste, günlük yaşamda işimize yarayacak bazı <strong>temel sağlık bilgilerini</strong> öğreneceğiz.<br />
+              Hazırsan başlayalım!<br /><br />
+
+              <strong>Ne zaman doktora gitmeliyiz?</strong><br />
+              Kendimizi iyi hissetmediğimizde bazı belirtiler doktora gitmemiz gerektiğini gösterebilir:<br />
+              - Yüksek ateş<br />
+              - Şiddetli baş ağrısı<br />
+              - Devam eden öksürük<br />
+              - Karın ağrısı<br />
+              - Nefes almakta zorlanma<br /><br />
+
+              Bu gibi durumlarda bir yetişkine haber verip doktora gitmeliyiz.<br /><br />
+
+              <strong>İlaçları nasıl kullanmalıyız?</strong><br />
+              - İlaçlar sadece doktorun dediği şekilde kullanılmalıdır.<br />
+              - Kendi başımıza ilaç içmemeliyiz.<br />
+              - Tarihi geçmiş ilaçları kullanmamalıyız.<br /><br />
+
+              <strong>Temizlik sağlık için neden önemli?</strong><br />
+              Temizlik, hastalıklardan korunmamıza yardımcı olur:<br />
+              - Ellerimizi yıkamak<br />
+              - Dişlerimizi fırçalamak<br />
+              - Düzenli banyo yapmak<br /><br />
+
+              Bunlar sağlığımızı korumak için çok önemlidir.<br /><br />
+
+              <strong>Yeterli uyku</strong><br />
+              - Günde 8–10 saat uyumalıyız.<br />
+              - Uykusuz kalmak yorgunluk ve dikkat eksikliği yapar.<br />
+              - İyi uyku, güçlü bir bağışıklık sistemine katkı sağlar.<br /><br />
+
+              <strong>Sağlıklı beslenme</strong><br />
+              - Meyve ve sebzeleri düzenli tüketmeliyiz.<br />
+              - Çok fazla şekerli veya yağlı yiyeceklerden uzak durmalıyız.<br />
+              - Yeterli su içmeliyiz (günde en az 6–8 bardak).<br /><br />
+
+              Sağlıklı olmak, mutlu olmak demektir.<br />
+              Kendine iyi bak ve öğrendiklerini hayatına uygula.<br />
+              Bir sonraki derste görüşmek üzere!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="topic loading-animation" onclick="toggleContent('topic4', this)" style="animation-delay: 0.4s">
+        <div class="topic-category">🥗 Beslenme</div>
+        <div class="topic-header">
+          <h2 class="topic-title">Gıda Seçimi ve Sağlıklı Beslenme</h2>
+          <div class="topic-icon pulse">🥗</div>
+        </div>
+        <p class="topic-preview">Sağlıklı beslenme rehberi: Doğru gıda seçimi, alışveriş ipuçları ve dengeli beslenme.</p>
+        <div class="expand-arrow">▼</div>
+        <div id="topic4" class="content">
+          <div class="video-container">
+            <div class="video-placeholder">
+              🎥 Video: Sağlıklı Beslenme Rehberi
+            </div>
+          </div>
+          <div class="transcript">
+            <strong>📝 Video İçeriği</strong>
+            <p>
+              Merhaba!<br />
+              Bu derste <strong>gıda seçimi</strong> ve <strong>sağlıklı beslenme</strong> hakkında konuşacağız.<br />
+              Hazırsan başlayalım!<br /><br />
+
+              <strong>Sağlıklı beslenmek ne demektir?</strong><br />
+              Sağlıklı beslenmek, vücudumuzun ihtiyacı olan besinleri dengeli bir şekilde almaktır.<br /><br />
+              - Her gün meyve ve sebze yemeliyiz.<br />
+              - Protein (et, yumurta, baklagiller) almamız gerekir.<br />
+              - Ekmek, makarna gibi karbonhidratlar da enerji verir.<br />
+              - Süt ve yoğurt gibi süt ürünleri kemiklerimiz için önemlidir.<br /><br />
+
+              <strong>Nelerden uzak durmalıyız?</strong><br />
+              - Çok yağlı, tuzlu ve şekerli yiyeceklerden uzak durmalıyız.<br />
+              - Fast food ve abur cubur sık tüketilmemelidir.<br />
+              - Gazlı içecekler yerine su tercih edilmelidir.<br /><br />
+
+              <strong>Alışverişte nelere dikkat etmeliyiz?</strong><br />
+              - Paketli ürünlerde son kullanma tarihine bakmalıyız.<br />
+              - Etiketleri okuyarak içinde ne olduğunu öğrenmeliyiz.<br />
+              - Taze ve doğal gıdalar tercih etmeliyiz.<br /><br />
+
+              <strong>Su içmek neden önemlidir?</strong><br />
+              - Su, vücudumuzun çalışması için çok gereklidir.<br />
+              - Günde en az 6–8 bardak su içmeliyiz.<br />
+              - Su içmek hem sağlıklı kalmamıza hem de enerjik olmamıza yardım eder.<br /><br />
+
+              <strong>Gerçek yaşam örnekleri</strong><br />
+              - Kahvaltıda yumurta, peynir, ekmek ve süt tüketebiliriz.<br />
+              - Öğle yemeğinde sebze ve yoğurt, akşam yemeğinde çorba ve meyve iyi tercihlerdir.<br />
+              - Ara öğünlerde abur cubur yerine ceviz veya elma yiyebiliriz.<br /><br />
+
+              Sağlıklı beslenmek bizi hem fiziksel hem de zihinsel olarak güçlü kılar.<br />
+              Unutma, doğru beslenme sağlıklı bir yaşamın anahtarıdır.<br />
+              Bir sonraki derste görüşmek üzere!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="topic loading-animation" onclick="toggleContent('topic5', this)" style="animation-delay: 0.5s">
+        <div class="topic-category">🚑 İlk Yardım</div>
+        <div class="topic-header">
+          <h2 class="topic-title">Basit İlk Yardım Bilgisi</h2>
+          <div class="topic-icon pulse">🚑</div>
+        </div>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dijital Okur Yazarlık</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header, footer {
+      text-align: center;
+      padding: 30px 20px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      font-weight: 300;
+      letter-spacing: 1px;
+    }
+
+    footer a {
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      margin-left: 10px;
+      transition: all 0.3s ease;
+      border-bottom: 1px solid transparent;
+    }
+
+    footer a:hover {
+      color: white;
+      border-bottom-color: white;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      color: white;
+      text-align: center;
+      font-size: clamp(28px, 5vw, 42px);
+      margin-bottom: 50px;
+      font-weight: 600;
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+      letter-spacing: -0.5px;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .topic {
+      position: relative;
+      padding: 25px 30px;
+      margin: 25px 0;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.1),
+        0 1px 3px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      overflow: hidden;
+      font-size: 18px;
+      font-weight: 600;
+      color: #2c3e50;
+      letter-spacing: 0.5px;
+      animation: fadeInUp 1s ease-out both;
+    }
+
+    .topic::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .topic:hover::before {
+      left: 100%;
+    }
+
+    .topic:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 
+        0 25px 60px rgba(0, 0, 0, 0.2),
+        0 5px 20px rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 1);
+    }
+
+    .topic:nth-child(1) {
+      background: linear-gradient(135deg, rgba(52, 152, 219, 0.95) 0%, rgba(155, 89, 182, 0.95) 100%);
+      color: white;
+      animation-delay: 0.1s;
+    }
+
+    .topic:nth-child(2) {
+      background: linear-gradient(135deg, rgba(46, 204, 113, 0.95) 0%, rgba(52, 152, 219, 0.95) 100%);
+      color: white;
+      animation-delay: 0.2s;
+    }
+
+    .topic:nth-child(3) {
+      background: linear-gradient(135deg, rgba(230, 126, 34, 0.95) 0%, rgba(231, 76, 60, 0.95) 100%);
+      color: white;
+      animation-delay: 0.3s;
+    }
+
+    .topic:nth-child(4) {
+      background: linear-gradient(135deg, rgba(142, 68, 173, 0.95) 0%, rgba(74, 144, 226, 0.95) 100%);
+      color: white;
+      animation-delay: 0.4s;
+    }
+
+    .content {
+      display: none;
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.98);
+      padding: 25px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: slideDown 0.3s ease-out;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .content p {
+      color: #2c3e50;
+      line-height: 1.7;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .content strong {
+      color: #34495e;
+      font-weight: 700;
+    }
+
+    video {
+      width: 100%;
+      max-height: 450px;
+      margin-bottom: 20px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease;
+    }
+
+    video:hover {
+      transform: scale(1.02);
+    }
+
+    /* Floating particles effect */
+    .particle {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.6;
+      animation: float 15s infinite linear;
+      z-index: 0;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      main {
+        padding: 40px 15px;
+      }
+      
+      .topic {
+        padding: 20px 25px;
+        margin: 20px 0;
+        font-size: 16px;
+      }
+      
+      .content {
+        padding: 20px;
+      }
+      
+      .content p {
+        font-size: 15px;
+      }
+      
+      header, footer {
+        padding: 20px 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        margin-bottom: 30px;
+      }
+      
+      .topic {
+        padding: 18px 20px;
+        font-size: 15px;
+      }
+      
+      .content {
+        padding: 18px;
+      }
+      
+      .content p {
+        font-size: 14px;
+      }
+    }
+
+    /* Scroll animations */
+    .topic {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.8s ease-out forwards;
+    }
+  </style>
+  <script>
+    function toggleContent(id) {
+      const content = document.getElementById(id);
+      const isVisible = content.style.display === 'block';
+      
+      // Close all other contents
+      const allContents = document.querySelectorAll('.content');
+      allContents.forEach(c => {
+        if (c !== content) {
+          c.style.display = 'none';
+        }
+      });
+      
+      // Toggle current content
+      content.style.display = isVisible ? 'none' : 'block';
+      
+      // Smooth scroll to content if opening
+      if (!isVisible) {
+        setTimeout(() => {
+          content.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'nearest' 
+          });
+        }, 150);
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="particle" style="left: 10%; width: 3px; height: 3px; background: rgba(255,255,255,0.7); animation-delay: 0s;"></div>
+  <div class="particle" style="left: 20%; width: 2px; height: 2px; background: rgba(255,255,255,0.5); animation-delay: 2s;"></div>
+  <div class="particle" style="left: 30%; width: 4px; height: 4px; background: rgba(255,255,255,0.6); animation-delay: 4s;"></div>
+  <div class="particle" style="left: 40%; width: 2px; height: 2px; background: rgba(255,255,255,0.8); animation-delay: 6s;"></div>
+  <div class="particle" style="left: 50%; width: 3px; height: 3px; background: rgba(255,255,255,0.4); animation-delay: 8s;"></div>
+  <div class="particle" style="left: 60%; width: 2px; height: 2px; background: rgba(255,255,255,0.7); animation-delay: 10s;"></div>
+  <div class="particle" style="left: 70%; width: 4px; height: 4px; background: rgba(255,255,255,0.5); animation-delay: 12s;"></div>
+  <div class="particle" style="left: 80%; width: 2px; height: 2px; background: rgba(255,255,255,0.6); animation-delay: 14s;"></div>
+  <div class="particle" style="left: 90%; width: 3px; height: 3px; background: rgba(255,255,255,0.8); animation-delay: 16s;"></div>
+
+  <header>
+    <h1>Dijital Okuryazarlık</h1>
+  </header>
+  <main>
+    <div class="topic" onclick="toggleContent('topic1')">
+      Telefon Kullanımı
+      <div id="topic1" class="content">
+        <video controls>
+          <source src="video/telefon.mp4" type="video/mp4" />
+          Tarayıcınız video etiketini desteklemiyor.
+        </video>
+        <p><strong>Transkript:</strong></p>
+        <p>
+          Merhaba! Bu videoda, telefonunuzu nasıl kullanacağınızı öğreneceksiniz. Telefonla arama yapmayı, mesaj göndermeyi ve gelen çağrılara nasıl cevap vereceğinizi adım adım göstereceğiz. Hadi başlayalım!<br /><br />
+
+          Öncelikle, telefonunuzu açmak için sağdaki veya üstteki güç düğmesine basılı tutun. Ekran açıldığında, ekran kilidini açmak için ekrana dokunun veya parmağınızla yukarı doğru kaydırın.<br /><br />
+
+          Telefon ekranında, genellikle yeşil renkli bir telefon simgesi vardır. Ona dokunun. Açılan ekranda 'Tuş Takımı' seçeneğini göreceksiniz. Buraya aramak istediğiniz numarayı tuşlayın. Örneğin, 123 45 67 89. Sonra yine yeşil telefon simgesine basarak aramayı başlatın.<br /><br />
+
+          Telefonunuzda kayıtlı kişileriniz varsa, ekranınızda 'Kişiler' veya 'Rehber' simgesine dokunun. Kişilerinizin listesi karşınıza gelir. Aramak istediğiniz kişinin adına dokunun. Sonra çıkan telefon simgesine basarak arama yapabilirsiniz.<br /><br />
+
+          Telefonunuz çaldığında, ekranda yeşil ve kırmızı butonlar çıkar. Yeşil buton aramayı cevaplamak içindir. Ekrana dokunun veya yeşil butonu sağa kaydırarak aramayı açabilirsiniz. Kırmızı buton ise aramayı reddeder. Eğer aramayı cevaplamak istemiyorsanız kırmızı butona dokunun.<br /><br />
+
+          Arama sırasında ekranda hoparlör, mikrofon sessize alma gibi simgeler olur. Hoparlör simgesine dokunursanız, telefonu kulaktan kaldırıp sesi dışarıya açabilirsiniz. Mikrofon simgesi ile karşı tarafın sizi duyup duymadığını kontrol edebilirsiniz. Görüşmeyi bitirmek için kırmızı telefon simgesine dokunun.<br /><br />
+
+          Telefon ekranında mesajlar uygulamasına dokunun. Yeni mesaj oluşturmak için ekranın altındaki '+' veya 'Yeni Mesaj' butonuna basın. Kime kısmına mesaj göndereceğiniz kişinin telefon numarasını ya da ismini yazın. Mesajınızı yazmak için ekrandaki klavyeyi kullanın. Yazdığınız mesajı göndermek için genellikle sağda bulunan gönder butonuna dokunun.<br /><br />
+
+          Yeni bir mesaj geldiğinde telefonunuz size bildirim verir. Mesajlar uygulamasını açarak gelen mesajı görebilirsiniz. Mesajı okuyup cevaplamak için ekranda 'Yanıtla' seçeneğine dokunun. Cevabınızı yazıp tekrar gönder butonuna basabilirsiniz.<br /><br />
+
+          Telefonunuzda erişilebilirlik ayarları sayesinde ekranı büyütebilir veya sesli okuyucu kullanabilirsiniz. Ayarlar menüsünden 'Erişilebilirlik' seçeneğine girin. Burada büyütme, konuşma veya ekran okuyucu seçeneklerini aktif edebilirsiniz. Bu özellikler telefon kullanımınızı kolaylaştıracaktır.<br /><br />
+
+          Telefon kilitliyken bile acil durum araması yapabilirsiniz. Kilit ekranında genellikle 'Acil Durum' butonu bulunur. Ona dokunarak 112 veya diğer acil numaraları arayabilirsiniz.<br /><br />
+
+          Bu videoda, telefon açma, arama yapma, gelen aramaları cevaplama ve mesaj gönderme işlemlerini öğrendiniz. Telefon kullanımında pratik yaptıkça daha kolay hale gelecektir. İzlediğiniz için teşekkür ederiz. Başka videolarda görüşmek üzere!
+        </p>
+      </div>
+    </div>
+
+  <div class="topic" onclick="toggleContent('topic2')">
+  QR kod ve barkod nedir?
+  <div id="topic2" class="content">
+    <video controls>
+      <source src="video/barkod.mp4" type="video/mp4" />
+      Tarayıcınız video etiketini desteklemiyor.
+    </video>
+    <p><strong>Transkript:</strong></p>
+    <p>
+      Merhaba!<br /><br />
+      Bugün çok sık gördüğümüz ama çoğumuzun tam olarak ne işe yaradığını bilmediği iki önemli şeyi öğreneceğiz: QR kod ve barkod.<br /><br />
+
+      <strong>📦 İlk olarak: Barkod nedir?</strong><br />
+      Barkod, genellikle ürünlerin üzerinde bulunan siyah çizgilerden oluşur.<br />
+      Bu çizgiler aslında bir sayıyı temsil eder.<br />
+      Marketlerde ürünleri kasadan geçirirken "bip" sesi duyarsın ya, işte o ses barkodun okunduğunu gösterir.<br />
+      Barkod sayesinde ürünün fiyatı ve bilgileri hemen bilgisayara gider.<br />
+      Yani barkod, ürünlerin kolay tanınmasını sağlar.<br /><br />
+
+      <strong>📱 Peki ya QR kod nedir?</strong><br />
+      QR kod, kare şeklinde küçük siyah beyaz kutucuklardan oluşur.<br />
+      Telefonumuzun kamerasını bu kareye tuttuğumuzda içindeki bilgi açılır.<br />
+      Bu bilgi bir internet adresi, bir video, bir fotoğraf ya da bir yazı olabilir.<br />
+      Örneğin: Bir müzenin girişinde QR kod görebilirsin. Telefonunu tutunca müze hakkında bilgi açılır.<br /><br />
+
+      <strong>🔍 QR kod nasıl kullanılır?</strong><br />
+      Çok kolay! Sadece şu adımları izle:<br />
+      1. Telefonunun kamerasını aç.<br />
+      2. QR kodun üzerine tut.<br />
+      3. Ekranda çıkan bağlantıya dokun.<br />
+      Ve işlem tamam!<br /><br />
+
+      <strong>🧠 Barkod ve QR kod ne işe yarar?</strong><br />
+      - Barkod, ürünlerin hızlı satılmasını sağlar.<br />
+      - QR kod ise bize hızlı bilgi verir.<br />
+      - Her ikisi de teknolojiyi kolaylaştırır.<br /><br />
+
+      <strong>🎯 Gerçek hayat örnekleri:</strong><br />
+      - Markette süt kutusunun üstündeki çizgiler: barkod!<br />
+      - Bir dergideki kare kutuya telefonunu tutmak: QR kod!<br />
+      - Biletlerde, aşı kartlarında, müzelerde... her yerde QR kod olabilir.<br /><br />
+
+      Unutma, QR kod ve barkod bizim hayatımızı kolaylaştırır.<br />
+      Kendine iyi bak, bir sonraki videoda görüşmek üzere!
+    </p>
+  </div>
+</div>
+
+
+   <div class="topic" onclick="toggleContent('topic3')">
+  WhatsApp/YouTube Kullanımı
+  <div id="topic3" class="content">
+    <video controls>
+      <source src="video/wp.mp4" type="video/mp4" />
+      Tarayıcınız video etiketini desteklemiyor.
+    </video>
+    <p><strong>Transkript:</strong></p>
+    <p>
+      Merhaba!<br />
+      Bugün seninle cep telefonunda sık kullanılan iki uygulamayı öğreneceğiz: <strong>WhatsApp</strong> ve <strong>YouTube</strong>.<br />
+      Bu uygulamalar sayesinde sevdiklerinle mesajlaşabilir, görüntülü konuşabilir ve videolar izleyebilirsin. Hadi başlayalım!<br /><br />
+
+      <strong>📲 WhatsApp Nedir?</strong><br />
+      WhatsApp, telefonla mesaj göndermeni, sesli veya görüntülü arama yapmanı sağlar. İnternet üzerinden çalışır.<br /><br />
+
+      <strong>🟢 WhatsApp Nasıl Açılır?</strong><br />
+      1. Yeşil simgeli WhatsApp'a dokun.<br />
+      2. Sohbet listesini gör.<br /><br />
+
+      <strong>💬 Mesaj Gönderme</strong><br />
+      1. Sağ alttaki sohbet simgesine dokun.<br />
+      2. Kişiyi seç, mesaj yaz ve gönder.<br /><br />
+
+      <strong>🎤 Sesli Mesaj Gönderme</strong><br />
+      Mikrofon simgesine basılı tut, konuş ve gönder.<br /><br />
+
+      <strong>📞 Görüntülü veya Sesli Arama</strong><br />
+      Sohbet ekranında üstteki telefon veya kamera simgesine dokun.<br /><br />
+
+      <strong>📷 Fotoğraf/Video Gönderme</strong><br />
+      Ataç simgesine dokun, galeri seç, gönder.<br /><br />
+
+      <strong>🚨 Erişilebilirlik Ayarları</strong><br />
+      Telefon ayarlarında yazıları büyüt veya ekran okuyucu aç.<br /><br />
+
+      <strong>▶️ YouTube Nedir?</strong><br />
+      YouTube video izleme uygulamasıdır. Müzik, eğlence, bilgi!<br /><br />
+
+      <strong>🔍 Nasıl Kullanılır?</strong><br />
+      1. Kırmızı simgeli YouTube'u aç.<br />
+      2. Üstteki kutuya yaz, videoyu seç ve izle.<br /><br />
+
+      <strong>❤️ Beğen ve Abone Ol</strong><br />
+      Videonun altında "Beğen" ve "Abone Ol" butonları var.<br /><br />
+
+      <strong>🕒 Video Kontrolleri</strong><br />
+      Durdurmak ve sarmak için ekrana dokun.<br /><br />
+
+      <strong>⚙️ Alt Yazı ve Yazı Büyütme</strong><br />
+      "CC" simgesine dokunarak alt yazı aç, yazı tipi büyüt.<br /><br />
+
+      <strong>✅ Özet</strong><br />
+      - WhatsApp: mesajlaş, görüntülü ara.<br />
+      - YouTube: video izle, abone ol.<br />
+      - Erişilebilirlik ayarlarını kullan.<br /><br />
+
+      Aferin! Bu dersi başarıyla tamamladın. 🎉<br />
+      Uygulama yaptıkça daha da kolaylaşacak.<br />
+      Bir sonraki derste görüşmek üzere! 👋
+    </p>
+  </div>
+</div>
+
+
+  <div class="topic" onclick="toggleContent('topic6')">
+  İnternette Bilgi Arama
+  <div id="topic6" class="content">
+    <video controls>
+      <source src="video/int.mp4" type="video/mp4" />
+      Tarayıcınız video etiketini desteklemiyor.
+    </video>
+    <p><strong>Transkript:</strong></p>
+    <p>
+      Merhaba!<br />
+      Bugün internette nasıl bilgi arayabileceğimizi öğreneceğiz.<br /><br />
+
+      📱 Bilgi aramak için cep telefonu, tablet veya bilgisayara ihtiyacımız var.<br />
+      İnternete bağlı olduğumuzdan emin olmalıyız.<br /><br />
+
+      🌐 İlk adım: Google veya başka bir arama motoruna girmek.<br />
+      Telefon veya bilgisayarda internet tarayıcısını açın.<br />
+      En çok kullanılan sitelerden biri: <strong>www.google.com</strong><br /><br />
+
+      🔎 Arama kutusuna istediğimiz bilgiyi yazıyoruz.<br />
+      Örneğin:<br />
+      - "Kolay kek tarifi"<br />
+      - "İstanbul'da bugün hava durumu"<br />
+      - "En yakın eczane nerede?"<br /><br />
+
+      Yazdıktan sonra, klavyedeki "Ara" ya da "Büyüteç" simgesine dokunuyoruz.<br /><br />
+
+      📄 Karşımıza çıkan sonuçlardan en üsttekiler genelde en güvenilir olandır.<br />
+      İlk sayfaya dikkatlice bakıp doğru ve güvenilir kaynağa tıklamalıyız.<br /><br />
+
+      📷 Görsel aramak istiyorsak, üstteki "Görseller" sekmesine dokunabiliriz.<br />
+      📹 Video istiyorsak "Videolar" sekmesine basabiliriz.<br /><br />
+
+      🧠 Püf Noktası:<br />
+      Ne kadar net yazarsak, o kadar doğru sonuç alırız.<br />
+      Örneğin "baş ağrısı neden olur" yerine "alnımda ağrı var ne yapmalıyım" gibi daha açık yazabiliriz.<br /><br />
+
+      ⚠️ Dikkat Edilmesi Gerekenler:<br />
+      - Her gördüğümüz bilgi doğru olmayabilir.<br />
+      - Devlet siteleri (.gov.tr) ve güvenilir sağlık, eğitim siteleri tercih edilmelidir.<br />
+      - Bilmediğimiz sitelerde kişisel bilgi girmemeliyiz!<br /><br />
+
+      ✅ Özet:<br />
+      - Tarayıcıyı aç<br />
+      - Google'a gir<br />
+      - Aramak istediğini yaz<br />
+      - Sonuçlardan doğru olana tıkla<br /><br />
+
+      Artık sen de internette bilgi aramayı biliyorsun! 🎉<br />
+      Unutma, pratik yaptıkça daha da kolaylaşacak.<br /><br />
+
+      Bir sonraki videoda görüşmek üzere! 👋
+    </p>
+  </div>
+</div>
+
+ 
+  </main>
+  <footer>
+    © Egehan Bayram | <a href="index.html">Ana Sayfa</a>
+  </footer>
+</body>
+</html>
